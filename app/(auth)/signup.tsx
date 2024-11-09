@@ -3,13 +3,72 @@ import {
   TextInput,
   View,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Link, router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useState } from "react";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
+import { firebaseApp } from "@/app/_layout";
 
 export default function SignupScreen() {
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSignup = async () => {
+    if (password !== confirmPassword) {
+      Alert.alert("Error", "Passwords don't match!");
+      return;
+    }
+
+    if (!fullName || !email || !password) {
+      Alert.alert("Error", "Please fill in all fields");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const auth = getAuth(firebaseApp);
+      const { user } = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      // Update user profile with full name
+      await updateProfile(user, {
+        displayName: fullName,
+      });
+
+      // Reset form
+      setFullName("");
+      setEmail("");
+      setPassword("");
+      setConfirmPassword("");
+
+      // Show success message and redirect to login
+      Alert.alert("Success", "Account created successfully! Please login.", [
+        {
+          text: "OK",
+          onPress: () => router.replace("/login"),
+        },
+      ]);
+    } catch (error: any) {
+      Alert.alert("Error", error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <ImageBackground
       source={require("@/assets/images/bg.jpg")}
@@ -31,6 +90,8 @@ export default function SignupScreen() {
               className="w-full p-4 mb-4 bg-white border border-gray-200 rounded-lg"
               autoCapitalize="words"
               placeholderTextColor="#667781"
+              value={fullName}
+              onChangeText={setFullName}
             />
 
             <TextInput
@@ -39,6 +100,8 @@ export default function SignupScreen() {
               keyboardType="email-address"
               autoCapitalize="none"
               placeholderTextColor="#667781"
+              value={email}
+              onChangeText={setEmail}
             />
 
             <TextInput
@@ -46,6 +109,8 @@ export default function SignupScreen() {
               className="w-full p-4 mb-4 bg-white border border-gray-200 rounded-lg"
               secureTextEntry
               placeholderTextColor="#667781"
+              value={password}
+              onChangeText={setPassword}
             />
 
             <TextInput
@@ -53,17 +118,24 @@ export default function SignupScreen() {
               className="w-full p-4 mb-6 bg-white border border-gray-200 rounded-lg"
               secureTextEntry
               placeholderTextColor="#667781"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
             />
 
             <TouchableOpacity
-              className="bg-teal-green items-center w-full p-4 rounded-lg shadow-sm"
-              onPress={() => console.log("Signup pressed")}
+              className={`bg-teal-green items-center w-full p-4 rounded-lg shadow-sm ${
+                loading ? "opacity-50" : ""
+              }`}
+              onPress={handleSignup}
+              disabled={loading}
             >
-              <Text className="text-lg font-bold text-white">Sign Up</Text>
+              <Text className="text-lg font-bold text-white">
+                {loading ? "Creating Account..." : "Sign Up"}
+              </Text>
             </TouchableOpacity>
           </View>
 
-          <Link href="/" asChild>
+          <Link href="/login" asChild>
             <TouchableOpacity className="mt-6">
               <Text className="text-teal-dark text-base">
                 Already have an account?{" "}
