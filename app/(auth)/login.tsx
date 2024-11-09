@@ -26,7 +26,7 @@ export default function LoginScreen() {
 
   return (
     <ImageBackground
-      source={require("../../assets/images/bg.jpg")}
+      source={require("@/assets/images/bg.jpg")}
       className="flex-1"
     >
       <SafeAreaView className="items-center justify-center flex-1 p-4">
@@ -55,7 +55,7 @@ export default function LoginScreen() {
           />
 
           <TouchableOpacity
-            className="bg-teal-green items-center w-full p-4 rounded-lg shadow-sm"
+            className="bg-teal-green items-center p-4 rounded-lg shadow-sm"
             onPress={handleLogin}
           >
             <Text className="text-lg font-bold text-white">Login</Text>
