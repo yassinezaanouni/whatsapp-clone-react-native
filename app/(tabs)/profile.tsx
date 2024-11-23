@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { View, TextInput, TouchableOpacity, Alert, Image } from "react-native";
+import {
+  View,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
 import { Text } from "react-native";
 import { useAuth } from "@/context/auth";
 import { db } from "@/config/firebase";
 import { ref, get, update } from "firebase/database";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-
+import { Header } from "@/components/Header";
 type UserProfile = {
   fullName: string;
   email: string;
@@ -63,26 +69,24 @@ export default function ProfileScreen() {
 
   if (!profile) {
     return (
-      <View className="items-center justify-center flex-1">
-        <Text>Loading...</Text>
+      <View className="bg-gray-50 items-center justify-center flex-1">
+        <ActivityIndicator size="large" color="#128C7E" />
       </View>
     );
   }
 
   return (
     <SafeAreaView className="bg-gray-50 flex-1">
-      <View className="p-4">
-        {/* Header */}
-        <View className="flex-row items-center justify-between mb-8">
-          <Text className="text-2xl font-bold text-gray-800">Profile</Text>
-          <TouchableOpacity
-            onPress={signOut}
-            className="px-4 py-2 bg-gray-100 rounded-full"
-          >
-            <Ionicons name="log-out-outline" size={24} color="#EF4444" />
-          </TouchableOpacity>
-        </View>
+      <Header
+        title="Profile"
+        rightIcon={{
+          name: "log-out-outline",
+          color: "#EF4444",
+          onPress: signOut,
+        }}
+      />
 
+      <View className="p-4">
         {/* Profile Picture Section */}
         <View className="items-center mb-8">
           <View className="relative">
