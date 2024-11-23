@@ -1,8 +1,12 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { auth } from "@/config/firebase";
+import { User as FirebaseUser } from "firebase/auth";
+import { signOut as firebaseSignOut } from "firebase/auth";
 
 type User = {
   id: string;
-  email: string;
+  email: string | null;
+  displayName: string | null;
 } | null;
 
 type AuthContextType = {
@@ -16,13 +20,33 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User>(null);
 
+  useEffect(() => {
+    // Subscribe to auth state changes
+    const unsubscribe = auth.onAuthStateChanged(
+      (firebaseUser: FirebaseUser | null) => {
+        if (firebaseUser) {
+          setUser({
+            id: firebaseUser.uid,
+            email: firebaseUser.email,
+            displayName: firebaseUser.displayName,
+          });
+        } else {
+          setUser(null);
+        }
+      }
+    );
+
+    // Cleanup subscription
+    return () => unsubscribe();
+  }, []);
+
   const signIn = async (email: string, password: string) => {
-    // TODO: Implement real authentication
-    setUser({ id: "1", email });
+    // The actual Firebase authentication is now handled in the login screen
+    // This function is kept for interface consistency
   };
 
   const signOut = async () => {
-    setUser(null);
+    await firebaseSignOut(auth);
   };
 
   return (

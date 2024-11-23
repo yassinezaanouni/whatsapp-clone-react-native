@@ -15,7 +15,7 @@ import {
   createUserWithEmailAndPassword,
   updateProfile,
 } from "firebase/auth";
-import { firebaseApp } from "@/app/_layout";
+import { firebaseApp } from "@/config/firebase";
 
 export default function SignupScreen() {
   const [fullName, setFullName] = useState("");

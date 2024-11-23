@@ -10,17 +10,39 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Link } from "expo-router";
 import { useState } from "react";
 import { useAuth } from "@/context/auth";
+import { auth } from "@/config/firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const { signIn } = useAuth();
 
   const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert("Error", "Please fill in all fields");
+      return;
+    }
+
     try {
-      await signIn(email, password);
-    } catch (error) {
-      Alert.alert("Error", "Failed to sign in");
+      setIsLoading(true);
+      const response = await signInWithEmailAndPassword(auth, email, password);
+      if (response.user) {
+        await signIn(email, password);
+      }
+    } catch (error: any) {
+      let message = "Failed to sign in";
+      if (error.code === "auth/invalid-email") {
+        message = "Invalid email address";
+      } else if (error.code === "auth/user-not-found") {
+        message = "No account found with this email";
+      } else if (error.code === "auth/wrong-password") {
+        message = "Incorrect password";
+      }
+      Alert.alert("Error", message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -57,8 +79,11 @@ export default function LoginScreen() {
           <TouchableOpacity
             className="bg-teal-green items-center p-4 rounded-lg shadow-sm"
             onPress={handleLogin}
+            disabled={isLoading}
           >
-            <Text className="text-lg font-bold text-white">Login</Text>
+            <Text className="text-lg font-bold text-white">
+              {isLoading ? "Logging in..." : "Login"}
+            </Text>
           </TouchableOpacity>
         </View>
 
