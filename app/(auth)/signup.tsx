@@ -10,12 +10,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Link, router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  updateProfile,
-} from "firebase/auth";
-import { firebaseApp } from "@/config/firebase";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { db, firebaseApp } from "@/config/firebase";
+import { ref, set } from "firebase/database";
 
 export default function SignupScreen() {
   const [fullName, setFullName] = useState("");
@@ -44,9 +41,12 @@ export default function SignupScreen() {
         password
       );
 
-      // Update user profile with full name
-      await updateProfile(user, {
-        displayName: fullName,
+      await set(ref(db, `users/${user.uid}`), {
+        uid: user.uid,
+        email: user.email,
+        fullName,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       });
 
       // Reset form
@@ -56,10 +56,10 @@ export default function SignupScreen() {
       setConfirmPassword("");
 
       // Show success message and redirect to login
-      Alert.alert("Success", "Account created successfully! Please login.", [
+      Alert.alert("Success", "Account created successfully! Redirecting...", [
         {
           text: "OK",
-          onPress: () => router.replace("/login"),
+          // onPress: () => router.replace("/login"),
         },
       ]);
     } catch (error: any) {

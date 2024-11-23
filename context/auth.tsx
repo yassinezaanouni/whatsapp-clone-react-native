@@ -6,7 +6,6 @@ import { signOut as firebaseSignOut } from "firebase/auth";
 type User = {
   id: string;
   email: string | null;
-  displayName: string | null;
 } | null;
 
 type AuthContextType = {
@@ -28,7 +27,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setUser({
             id: firebaseUser.uid,
             email: firebaseUser.email,
-            displayName: firebaseUser.displayName,
           });
         } else {
           setUser(null);

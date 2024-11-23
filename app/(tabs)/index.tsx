@@ -10,9 +10,7 @@ export default function HomeScreen() {
     <SafeAreaView className="flex-1">
       <View className="p-4">
         <Text className="text-xl font-bold">Chats</Text>
-        <Text className="mt-2 text-gray-600">
-          Logged in as: {user?.email} {user?.displayName}
-        </Text>
+        <Text className="mt-2 text-gray-600">Logged in as: {user?.email}</Text>
         <TouchableOpacity
           onPress={signOut}
           className="w-24 p-2 mt-4 bg-red-500 rounded-lg"
